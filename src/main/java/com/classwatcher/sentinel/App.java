@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,9 +36,7 @@ public class App
 		  
 		  welcome();
 		  initialize();
-		  validate(args);
-		  System.out.println("Validated. This does not mean your classes are found yet!");
-		  System.out.println("Adding your phone number...");
+		  validateInputs(args);
 		  addPhoneNumber(args);
 		  
 		  //if inputs are valid. do these
@@ -50,7 +47,7 @@ public class App
 			  testURL.get(url);
 			  
 			  if(testURL.getCurrentUrl().equalsIgnoreCase("https://www.newpaltz.edu/classes/")) {
-				  System.out.println("Semester and/or year is incorrect");
+				  System.out.println("ERROR: cannot find that schedule. Its possible that newpaltz hasnt released that schedule yet.");
 				  System.exit(2);
 			  }
 		  }
@@ -118,7 +115,7 @@ public class App
 						
 					if(seats.equals("F")) {
 						Date d = new Date();
-						System.out.println("\n" + d + " Class is still full! Trying again soon!\n");
+						System.out.println("\n" + d + " | This class is full! Trying again soon!\n");
 						Thread.sleep(TimeUnit.MINUTES.toMillis(getDelay(args))); //5mins
 					}
 					else {
@@ -145,67 +142,39 @@ public class App
 private static void addPhoneNumber(String[] args) {
 	if(args.length == 6) {
 		if(args[5].charAt(0) == 1 && args[5].length() == 11) {
-			TO = "+1" + args[5];
+			TO = "+" + args[5];
 		}
 	
 	  else {
-		  TO = "+" + args[6];
+		  TO = "+1" + args[5];
 	  }
 	}
 	else {
-		if(args[5].charAt(0) == 1 && args[5].length() == 11) {
-			TO = "+1" + args[5];
+		if(args[6].charAt(0) == 1 && args[6].length() == 11) {
+			TO = "+" + args[6];
 		}
 	
 	  else {
-		  TO = "+" + args[6];
+		  TO = "+1" + args[6];
 	  }
 	}
 		
 	}
 
-private static void validate(String[] args) {
+private static void validateInputs(String[] args) {
 	  //Semester, year, ClassSubject, CourseCRN, CheckFrequency, PhoneNumber = 6
 	  //or 
 	  //Semester, year, Class, ClassSubject2, CourseCRN, CheckFrequency, PhoneNumber  = 7
 	  //check input is valid here.
 	Calendar d = new GregorianCalendar();
-	
-	 if(hm.containsKey(args[0].toUpperCase())) {
-		  if(Integer.parseInt(args[1]) > d.get(Calendar.YEAR) + 2) {
-			  System.out.println("ERROR: Year parse error. Input year again.");
-			  System.exit(1);   
-		  }
-	  }
-	 
-	 else {
-		  System.out.println("ERROR: Semester parse error. Input Semester again.");
-		  System.exit(1);  
-	  }
-	
+
 	if((args.length == 6)) { 
 			  if(Integer.parseInt(args[4]) < 5) {
 				  System.out.println("ERROR: CheckFrequency parse error. Input a frequency greater than or equal to 5mins.");
 				  System.exit(1);
 			  }
-			  if(args[5].charAt(0) == '-') {
-				  System.out.println("International number detect! This may not work");
-				  System.out.println("Testing your number now... If you do not get a type 'q' to quit or 'y' that you received a text!");
-				  sendMessage("-Sentinel-\n This is a test for international numbers!");
-				  Scanner scnr = new Scanner(System.in);
-				  while(scnr.hasNext()) {
-					  if(scnr.nextLine().equalsIgnoreCase("y")) {
-						  System.out.println("Proceeding..");
-					  }
-					  else if(scnr.nextLine().equalsIgnoreCase("q")) {
-						  System.out.println("Sorry try another number.");
-						  System.exit(1);
-					  }
-				  }
-				  scnr.close();
-			  }
 			  else if(args[5].length() < 10) {
-				  System.out.println("ERROR: Phone number parse error. Phone number cant be less than 10 digits. If you have an international number put a -in front of number");
+				  System.out.println("ERROR: Phone number parse error. Phone number cant be less than 10 digits.");
 				  System.exit(1);
 			  }
 		  }
@@ -217,15 +186,30 @@ private static void validate(String[] args) {
 			  System.out.println("ERROR: CheckFrequency parse error. Input a frequency greater than or equal to 5mins.");
 			  System.exit(1);
 		  }
-		  if(args[6].charAt(0) == 1 && args[6].length() == 11) {
-			  System.out.println("ERROR: Phone number parse error. Input phone number without 1 in front of it.");
-			  System.exit(1);
-		  }
 		  else if(args[6].length() < 10) {
 			  System.out.println("ERROR: Phone number parse error. Phone number cant be less than 10 digits.");
 			  System.exit(1);
 		  }
 		  
+	  }
+	  else if(args.length == 1 && args[0].equalsIgnoreCase("-help")) {
+		  System.out.println("\t\tInput arguments are as follows: ");
+		  System.out.println("Semester Year Single_Class_Subject Course_CRN Check_Frequency Phone_Number");
+		  System.out.println("\t\t\tor");
+		  System.out.println("Semester Year ClassSubjectPart1 ClassSubjectPart2 CourseCRN CheckFrequency PhoneNumber");
+		  System.exit(2);
+	  }
+	
+	 if(hm.containsKey(args[0].toUpperCase())) {
+		  if(Integer.parseInt(args[1]) > d.get(Calendar.YEAR) + 2) {
+			  System.out.println("ERROR: Year parse error. Input year again.");
+			  System.exit(1);   
+		  }
+	  }
+	 
+	 else {
+		  System.out.println("ERROR: Semester parse error. Input Semester again.");
+		  System.exit(1);  
 	  }
 		
 	}
@@ -318,7 +302,7 @@ public static void textString(String[] t) {
 	for(String ef: t) {
 		System.out.println(ef);
 	}
-	System.out.println(" ----End----- \n");
+	System.out.println(" -----End----- \n");
 }
 
 public static String sendMessage(String m) {
