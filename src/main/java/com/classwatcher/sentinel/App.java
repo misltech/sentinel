@@ -1,10 +1,10 @@
 package com.classwatcher.sentinel;
 
-import java.net.SocketException;
-import java.sql.Driver;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
@@ -18,11 +18,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
-import com.gargoylesoftware.htmlunit.WebClient;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
@@ -31,9 +26,9 @@ public class App
 {
 	  public static final String ACCOUNT_SID = "AC6a6209eba6bddff1fd289ea625a9a142";
 	  public static final String AUTH_TOKEN = "bcf28f5b1679be554eda5425819cbbd2";
-	  public static String TO = "+13477969840";
+	  public static String TO = "";
 	  public static final String FROM = "+17856694799";
-	  public static String scrapethis = "https://banner.newpaltz.edu/pls/PROD/bwckzschd.p_dsp_results?p_term=202001&p_subj=GLG&p_crses=&p_title=&p_credits=&p_days=&p_time_span=&p_levl=&p_instr_pidm=&p_attr=";
+	  public static String scrapethis = "";
 	  public static HashMap<String, String> hm; 
 	  public static Instant startTime;
 	  
@@ -42,22 +37,13 @@ public class App
 		  
 		  welcome();
 		  initialize();
-		  
-		    
-		  //Semester, year, ClassSubject, CourseCRN, CheckFrequency, PhoneNumber = 6
-		  //or 
-		  //Semester, year, Class, ClassSubject2, CourseCRN, CheckFrequency, PhoneNumber  = 7
-		  //check input is valid here.
-		  if((args.length == 6) || args.length == 7) {
-			  
-		  }
-		  else {
-			  System.out.println("ERROR: Wrong arguments added. Run program again with correct arguments");
-			  System.exit(1);
-		  }
+		  validate(args);
+		  System.out.println("Validated. This does not mean your classes are found yet!");
+		  System.out.println("Adding your phone number...");
+		  addPhoneNumber(args);
 		  
 		  //if inputs are valid. do these
-		  String url = "https://banner.newpaltz.edu/pls/PROD/bwckzschd.p_dsp_search?p_term=" + args[1] +  hm.get(args[0].toUpperCase());
+		  String url = "https://banner.newpaltz.edu/pls/PROD/bwckzschd.p_dsp_search?p_term=" + args[1] + hm.get(args[0].toUpperCase());
 		 
 		  WebDriver testURL = new HtmlUnitDriver();
 		  try {
@@ -76,32 +62,39 @@ public class App
 			{
 				WebElement select = testURL.findElement(By.xpath("//select[@id='p_subj']"));
 				List<WebElement> allOptions = select.findElements(By.tagName("option"));
+				
+				boolean found = false;
 				for (WebElement option : allOptions)
 				{
-					if (option.getText().equals(getCourseTitle(args)))
+					if (option.getText().equalsIgnoreCase(getCourseTitle(args)))
 					{
 						option.click();
+						found = true;
 					}
+				}
+				if(!found) {
+					System.out.println("Re-enter subject correctly. Your input was: " +getCourseTitle(args));
+					System.exit(1);
 				}
 			} catch (Exception ex)
 			{
-				System.out.println("Error clicking option " + getCourseTitle(args));
+				System.out.println("Subject not found: " + getCourseTitle(args));
+				System.exit(1);
 			}
 		  
-		  System.out.println("Found Subject...");
+		  
+		  System.out.println("Searching for " + getCourseTitle(args) + "...");
 		  
 		  WebElement submit = testURL.findElement(By.xpath("//button[@type='submit']"));
 		  submit.click();
 		  
 		    scrapethis = testURL.getCurrentUrl();
 		 	WebDriver driver = new HtmlUnitDriver();
-			System.out.println("Looking for your class..");
-			
 			System.out.println("Searching this URL: " + scrapethis);
-			System.out.println("Using this CRN: " + getCourseCRN(args));
+			System.out.println("For this CRN: " + getCourseCRN(args));
 			try {
-			System.out.println("Testing it against the website!");
 			driver.get(scrapethis);
+			@SuppressWarnings("unused")
 			WebElement e = driver.findElement(By.xpath("//*[@data-crn='" + getCourseCRN(args) + "']"));
 			System.out.println("Test Case Complete \n\n");
 			
@@ -129,7 +122,7 @@ public class App
 						Thread.sleep(TimeUnit.MINUTES.toMillis(getDelay(args))); //5mins
 					}
 					else {
-						sendMessage(getCourseTitle(args) + " " + getCourseCRN(args) + " class available! \n" + "Total runtime was " + getDetailedRunTime(startTime, Instant.now()) + " to complete.");
+						System.out.println("Message ID: " + sendMessage(getCourseTitle(args) + " " + getCourseCRN(args) + " class available! \n" + "Total runtime was " + getDetailedRunTime(startTime, Instant.now()) + " to complete."));
 						System.out.println(getCourseCRN(args) + " Class available!");
 						System.out.println("Ending watch class...");
 						break;
@@ -149,6 +142,94 @@ public class App
 			
 	  }
 	
+private static void addPhoneNumber(String[] args) {
+	if(args.length == 6) {
+		if(args[5].charAt(0) == 1 && args[5].length() == 11) {
+			TO = "+1" + args[5];
+		}
+	
+	  else {
+		  TO = "+" + args[6];
+	  }
+	}
+	else {
+		if(args[5].charAt(0) == 1 && args[5].length() == 11) {
+			TO = "+1" + args[5];
+		}
+	
+	  else {
+		  TO = "+" + args[6];
+	  }
+	}
+		
+	}
+
+private static void validate(String[] args) {
+	  //Semester, year, ClassSubject, CourseCRN, CheckFrequency, PhoneNumber = 6
+	  //or 
+	  //Semester, year, Class, ClassSubject2, CourseCRN, CheckFrequency, PhoneNumber  = 7
+	  //check input is valid here.
+	Calendar d = new GregorianCalendar();
+	
+	 if(hm.containsKey(args[0].toUpperCase())) {
+		  if(Integer.parseInt(args[1]) > d.get(Calendar.YEAR) + 2) {
+			  System.out.println("ERROR: Year parse error. Input year again.");
+			  System.exit(1);   
+		  }
+	  }
+	 
+	 else {
+		  System.out.println("ERROR: Semester parse error. Input Semester again.");
+		  System.exit(1);  
+	  }
+	
+	if((args.length == 6)) { 
+			  if(Integer.parseInt(args[4]) < 5) {
+				  System.out.println("ERROR: CheckFrequency parse error. Input a frequency greater than or equal to 5mins.");
+				  System.exit(1);
+			  }
+			  if(args[5].charAt(0) == '-') {
+				  System.out.println("International number detect! This may not work");
+				  System.out.println("Testing your number now... If you do not get a type 'q' to quit or 'y' that you received a text!");
+				  sendMessage("-Sentinel-\n This is a test for international numbers!");
+				  Scanner scnr = new Scanner(System.in);
+				  while(scnr.hasNext()) {
+					  if(scnr.nextLine().equalsIgnoreCase("y")) {
+						  System.out.println("Proceeding..");
+					  }
+					  else if(scnr.nextLine().equalsIgnoreCase("q")) {
+						  System.out.println("Sorry try another number.");
+						  System.exit(1);
+					  }
+				  }
+				  scnr.close();
+			  }
+			  else if(args[5].length() < 10) {
+				  System.out.println("ERROR: Phone number parse error. Phone number cant be less than 10 digits. If you have an international number put a -in front of number");
+				  System.exit(1);
+			  }
+		  }
+		  
+	  
+	  else if(args.length == 7){
+
+		  if(Integer.parseInt(args[5]) < 5) {
+			  System.out.println("ERROR: CheckFrequency parse error. Input a frequency greater than or equal to 5mins.");
+			  System.exit(1);
+		  }
+		  if(args[6].charAt(0) == 1 && args[6].length() == 11) {
+			  System.out.println("ERROR: Phone number parse error. Input phone number without 1 in front of it.");
+			  System.exit(1);
+		  }
+		  else if(args[6].length() < 10) {
+			  System.out.println("ERROR: Phone number parse error. Phone number cant be less than 10 digits.");
+			  System.exit(1);
+		  }
+		  
+	  }
+		
+	}
+
 private static void initialize() {
 	hm = new HashMap<String, String>();
 	hm.put("SPRING", "01");
@@ -220,6 +301,15 @@ public static void welcome() {
 			"(_______/(_______/|/     \\|\\_______)\\_______)  \\_______)(_______/|/    )_)   )_(   \\_______/|/    )_)(_______/(_______/\r\n" + 
 			"                                                                                                                       \r\n" + 
 			"");
+	System.out.println(
+			
+			
+			
+			
+			"THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE."
+			
+			);
+	System.out.println();
 	
 }
 	  
