@@ -197,6 +197,15 @@ private static void validateInputs(String[] args) {
 		  System.out.println("Semester Year Single_Class_Subject Course_CRN Check_Frequency Phone_Number");
 		  System.out.println("\t\t\tor");
 		  System.out.println("Semester Year ClassSubjectPart1 ClassSubjectPart2 CourseCRN CheckFrequency PhoneNumber");
+		  System.out.println("Example: Spring 2020 Computer Science 149 5 5555555555");
+		  System.exit(2);
+	  }
+	  else if(args.length == 0) {
+		  System.out.println("ERROR: Arguments required!");
+		  System.out.println("Semester Year Single_Class_Subject Course_CRN Check_Frequency Phone_Number");
+		  System.out.println("\t\t\tor");
+		  System.out.println("Semester Year ClassSubjectPart1 ClassSubjectPart2 CourseCRN CheckFrequency PhoneNumber");
+		  System.out.println("Example: Spring 2020 Computer Science 149 5 5555555555");
 		  System.exit(2);
 	  }
 	
