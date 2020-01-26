@@ -63,14 +63,15 @@ public class App
 				boolean found = false;
 				for (WebElement option : allOptions)
 				{
-					if (option.getText().equalsIgnoreCase(getCourseTitle(args)))
+					String temp = option.getText().replaceAll("\\s+", "");
+					if (temp.equalsIgnoreCase(getCourseTitle(args)))
 					{
 						option.click();
 						found = true;
 					}
 				}
 				if(!found) {
-					System.out.println("Re-enter subject correctly. Your input was: " +getCourseTitle(args));
+					System.out.println("ERROR: Subject not found. Your input was: " +getCourseTitle(args));
 					System.exit(1);
 				}
 			} catch (Exception ex)
@@ -121,7 +122,7 @@ public class App
 					else {
 						System.out.println("Message ID: " + sendMessage(getCourseTitle(args) + " " + getCourseCRN(args) + " class available! \n" + "Total runtime was " + getDetailedRunTime(startTime, Instant.now()) + " to complete."));
 						System.out.println(getCourseCRN(args) + " Class available!");
-						System.out.println("Ending watch class...");
+						System.out.println("Class sentinel ending...");
 						break;
 					}
 					
@@ -140,7 +141,7 @@ public class App
 	  }
 	
 private static void addPhoneNumber(String[] args) {
-	if(args.length == 6) {
+	
 		if(args[5].charAt(0) == 1 && args[5].length() == 11) {
 			TO = "+" + args[5];
 		}
@@ -149,25 +150,9 @@ private static void addPhoneNumber(String[] args) {
 		  TO = "+1" + args[5];
 	  }
 	}
-	else {
-		if(args[6].charAt(0) == 1 && args[6].length() == 11) {
-			TO = "+" + args[6];
-		}
-	
-	  else {
-		  TO = "+1" + args[6];
-	  }
-	}
-		
-	}
 
 private static void validateInputs(String[] args) {
-	  //Semester, year, ClassSubject, CourseCRN, CheckFrequency, PhoneNumber = 6
-	  //or 
-	  //Semester, year, Class, ClassSubject2, CourseCRN, CheckFrequency, PhoneNumber  = 7
-	  //check input is valid here.
 	Calendar d = new GregorianCalendar();
-
 	if((args.length == 6)) { 
 			  if(Integer.parseInt(args[4]) < 5) {
 				  System.out.println("ERROR: CheckFrequency parse error. Input a frequency greater than or equal to 5mins.");
@@ -179,19 +164,6 @@ private static void validateInputs(String[] args) {
 			  }
 		  }
 		  
-	  
-	  else if(args.length == 7){
-
-		  if(Integer.parseInt(args[5]) < 5) {
-			  System.out.println("ERROR: CheckFrequency parse error. Input a frequency greater than or equal to 5mins.");
-			  System.exit(1);
-		  }
-		  else if(args[6].length() < 10) {
-			  System.out.println("ERROR: Phone number parse error. Phone number cant be less than 10 digits.");
-			  System.exit(1);
-		  }
-		  
-	  }
 	  else if(args.length == 1 && args[0].equalsIgnoreCase("-help")) {
 		  System.out.println("\t\tInput arguments are as follows: ");
 		  System.out.println("Semester Year Single_Class_Subject Course_CRN Check_Frequency Phone_Number");
@@ -203,9 +175,7 @@ private static void validateInputs(String[] args) {
 	  else if(args.length == 0) {
 		  System.out.println("ERROR: Arguments required!");
 		  System.out.println("Semester Year Single_Class_Subject Course_CRN Check_Frequency Phone_Number");
-		  System.out.println("\t\t\tor");
-		  System.out.println("Semester Year ClassSubjectPart1 ClassSubjectPart2 CourseCRN CheckFrequency PhoneNumber");
-		  System.out.println("Example: Spring 2020 Computer Science 149 5 5555555555");
+		  System.out.println("Example: Spring 2020 ComputerScience 149 5 5555555555");
 		  System.exit(2);
 	  }
 	
@@ -220,7 +190,6 @@ private static void validateInputs(String[] args) {
 		  System.out.println("ERROR: Semester parse error. Input Semester again.");
 		  System.exit(1);  
 	  }
-		
 	}
 
 private static void initialize() {
@@ -251,35 +220,19 @@ public static boolean allowRuntime() {
 
 public static long getDelay(String[] d) {
 	long delay = 0;
-	if(d.length == 6) {
 		delay = Long.parseLong(d[4]);
-	}
-	else if (d.length == 7) {
-		delay = Long.parseLong(d[5]);
-	}
 	return delay;
 	
 }
 
 public static String getCourseTitle(String[] a){
 	String title = null;
-	if(a.length == 6) {
-		title = a[2];
-	}
-	else if (a.length == 7) {
-		title = a[2] + " " + a[3];
-	}
+	title = a[2];
 	return title;
-
 }
 public static String getCourseCRN(String[] c) {
 	String crn = null;
-	if(c.length == 6) {
-		crn = c[3];
-	}
-	else if(c.length == 7) {
-		crn = c[4];
-	}
+	crn = c[3];
 	return crn;
 }
 public static void welcome() {
