@@ -34,9 +34,7 @@ public class App
 	  public static String TO = "+13477969840";
 	  public static final String FROM = "+17856694799";
 	  public static String scrapethis = "https://banner.newpaltz.edu/pls/PROD/bwckzschd.p_dsp_results?p_term=202001&p_subj=GLG&p_crses=&p_title=&p_credits=&p_days=&p_time_span=&p_levl=&p_instr_pidm=&p_attr=";
-	  public static Instant start;
-	  public static Instant end;
-	  public static HashMap hm; 
+	  public static HashMap<String, String> hm; 
 	  public static Instant startTime;
 	  
 	  
@@ -57,8 +55,6 @@ public class App
 			  System.out.println("ERROR: Wrong arguments added. Run program again with correct arguments");
 			  System.exit(1);
 		  }
-		  
-		  
 		  
 		  //if inputs are valid. do these
 		  String url = "https://banner.newpaltz.edu/pls/PROD/bwckzschd.p_dsp_search?p_term=" + args[1] +  hm.get(args[0].toUpperCase());
@@ -121,24 +117,21 @@ public class App
 				try {
 					WebDriver continousDriver = new HtmlUnitDriver();
 					continousDriver.get(scrapethis);
-					WebElement e = continousDriver.findElement(By.xpath("//*[@data-crn='765']"));
-					System.out.println(e);
+					WebElement e = continousDriver.findElement(By.xpath("//*[@data-crn='" + getCourseCRN(args) + "']"));
 					System.out.println("Searching this CRN: " + getCourseCRN(args));
-					int rowNum = 12;
-					WebElement seats = e.findElement(By.xpath("//td[" + rowNum +"]"));
-					System.out.println(seats);
-					System.out.println("Number of seats are: " + seats);
+					String[] rowText = e.getText().split("\\s+");
+					String seats = rowText[rowText.length - 1];
+					System.out.println("Number of seats: " + seats);
 						
 					if(seats.equals("F")) {
 						Date d = new Date();
-						System.out.println("\n" + d + " Class not found! Trying again soon!\n");
+						System.out.println("\n" + d + " Class is still full! Trying again soon!\n");
 						Thread.sleep(TimeUnit.MINUTES.toMillis(getDelay(args))); //5mins
 					}
 					else {
-						sendMessage("Geology class available! \n" + "It took " + getRunTime(start, end) + " to complete.");
+						sendMessage(getCourseTitle(args) + " " + getCourseCRN(args) + " class available! \n" + "Total runtime was " + getDetailedRunTime(startTime, Instant.now()) + " to complete.");
 						System.out.println(getCourseCRN(args) + " Class available!");
-						System.out.println("Ending watch class");
-						end = java.time.Instant.now();
+						System.out.println("Ending watch class...");
 						break;
 					}
 					
@@ -157,7 +150,7 @@ public class App
 	  }
 	
 private static void initialize() {
-	hm = new HashMap();
+	hm = new HashMap<String, String>();
 	hm.put("SPRING", "01");
 	hm.put("SUMMER", "09");
 	hm.put("WINTER", "06");
@@ -174,7 +167,7 @@ private static void initialize() {
 
 public static boolean allowRuntime() {
 	
-	if(getRunTime(startTime, Instant.now()) >= 7) {
+	if(getRunTime(startTime, Instant.now()) > 7) {
 		return false;
 	}
 	
@@ -230,12 +223,27 @@ public static void welcome() {
 	
 }
 	  
+public static void textString(String[] t) {
+	System.out.println("\n ----Testing String----");
+	for(String ef: t) {
+		System.out.println(ef);
+	}
+	System.out.println(" ----End----- \n");
+}
 
 public static String sendMessage(String m) {
 	Message message = Message.creator(new PhoneNumber(TO + ""),new PhoneNumber(FROM), m).create();
 
   return message.getSid();
 
+}
+
+
+
+public static String getDetailedRunTime(Instant start, Instant end) {
+	Duration between = java.time.Duration.between(start, end);
+	String out = between.toDays() + "days " + between.toHours() + "hrs " + between.toMinutes() + "mins "+ between.getSeconds() + "secs";
+	return out;
 }
 
 public static long getRunTime(Instant start, Instant end) {
