@@ -23,8 +23,8 @@ import com.twilio.type.PhoneNumber;
 
 public class App 
 {
-	  public static final String ACCOUNT_SID = "AC6a6209eba6bddff1fd289ea625a9a142";
-	  public static final String AUTH_TOKEN = "bcf28f5b1679be554eda5425819cbbd2";
+	  public static final String ACCOUNT_SID = "SID";
+	  public static final String AUTH_TOKEN = "Token";
 	  public static String TO = "";
 	  public static final String FROM = "+17856694799";
 	  public static String scrapethis = "";
