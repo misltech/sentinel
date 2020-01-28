@@ -13,7 +13,7 @@ This program was created to run on a linux server that the school provides. By d
 Run ***`nohup command &`*** in the commandline
 ***nohup*** allows you to close the terminal and still have the program running. ***&*** allows the program to run in the background.
 
-    nohup java -jar sentinel.jar {args}
+    nohup java -jar sentinel.jar {args} &
 
 ***args are required***. Can also be requested when `java -jar sentinel.jar` is typed without arguments in the commandline
 
@@ -25,10 +25,15 @@ Run ***`nohup command &`*** in the commandline
 **Class_Subject** {String} If the subject has a space or other delimiters put them together. It is also not case sensitive.\
 **Course_CRN{int}** You can find this on the website.\
 **Phone_Number {int}** U.S numbers only.\
-Ex: `nohup java -jar sentinel.jar Spring 2020 Geology 149 5 5555555555`\
-Ex2: `nohup java -jar sentinel.jar Spring 2020 ComputerScience 293 5 5555555555`
+Ex: `nohup java -jar sentinel.jar Spring 2020 Geology 149 5 5555555555 &`\
+Ex2: `nohup java -jar sentinel.jar Spring 2020 ComputerScience 293 5 5555555555 &`
 
 After running this program on linux it will give you a PID code. Write it down somewhere as thats how you'll end the program.
+
+# Check runtime
+
+To check if the program is running. Check the last 5 lines of nohup.out using this in the same directory.
+```tail -f nohup.out```
 
 # How to end program
 
