@@ -1,6 +1,6 @@
 # sentinel
 
-This will continuously watch for an open spot on new paltz schedule for classes website. When a seat is found it will send you a text message. This program expires after 7 days of runtime.  Designed to be used for one week during syllabus week while everyone is still switching classes.
+This will continuously watch for an open spot on new paltz schedule for classes website. When a seat is found it will send you a text message. This program expires after 7 days of runtime.  This program was designed to be used during syllabus week while everyone is still switching classes.
 
 # prerequisite
 
@@ -19,12 +19,12 @@ Run ***`nohup command &`*** in the commandline
 
     Semester, Year, Class_Subject, Course_CRN, Check_Frequency, Phone_Number
 
-**Semester {String}** ex: Spring, Summer, Winter
-**Year {int}** please check that the schedule exist before requesting it.
-**Check Frequency_inMinutes** {int} has to be greater than 5 mins. Input represents a minute.    
-**Class_Subject** {String} If the subject has a space or other delimiters put them together. It is also not case sensitive.
-**Course_CRN{int}** You can find this on the website.
-**Phone_Number {int}** U.S numbers only.
+**Semester {String}** ex: Spring, Summer, Winter\
+**Year {int}** please check that the schedule exist before requesting it.\
+**Check Frequency_inMinutes** {int} has to be greater than 5 mins. Input represents a minute.\    
+**Class_Subject** {String} If the subject has a space or other delimiters put them together. It is also not case sensitive.\
+**Course_CRN{int}** You can find this on the website.\
+**Phone_Number {int}** U.S numbers only.\
 Ex: `nohup java -jar sentinel.jar Spring 2020 Geology 149 5 5555555555`
 Ex2: `nohup java -jar sentinel.jar Spring 2020 ComputerScience 293 5 5555555555`
 
